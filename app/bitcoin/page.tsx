@@ -17,16 +17,26 @@ export default function Page() {
         const transactionId = formData.get('txId') as string;
         setTxId(transactionId);
 
-        sessionStorage.setItem('txId', txId);
+        if (txId) {
+            console.log(txId);
+            // Call the API to get the transaction details
+            fetch(`/api/bitcoin/${transactionId}`)
+                .then((response) => response.json())
+                .then((data) => {
+                    setLoading(false);
+                    if (data.rawData === "") {
+                        setRawTxData("No data found");
+                        return;
+                    }
+                    sessionStorage.setItem('rawTxData', data.rawData);
+                    sessionStorage.setItem('txId', txId);
+                    setRawTxData(data.rawData);
+                }).catch((error) => {
+                    console.error(error);
+                    setLoading(false);
+                });
+        } else setLoading(false);
 
-        // Call the API to get the transaction details
-        fetch(`/api/bitcoin/${transactionId}`)
-            .then((response) => response.json())
-            .then((data) => {
-                console.log(data);
-                setLoading(false);
-                sessionStorage.setItem('rawTxData', data.rawData);
-            })
     }
     return (
         <div className="flex flex-col items-center justify-start w-full p-8 sm:p-20 sm:pt-8">
