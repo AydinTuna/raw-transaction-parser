@@ -85,15 +85,21 @@ export function parseRawTx(rawTxData: string) {
 
     let _scriptSigbyteSize = 0;
     for (let i = 0; i < parseInt(inputCountHex as string, 16); i++) {
-        const k = i + 1;
         const input = new Input();
-        const [scriptSigLength, scriptSigbyteSize] = calculateCompactSize(rawTxData, k * (42 + byteSize));
+        input.txid = getBytesOfHex(rawTxData, totalRawTxDataByteSize, 32);
+        totalRawTxDataByteSize += 32;
+        input.vout = getBytesOfHex(rawTxData, totalRawTxDataByteSize, 4);
+        totalRawTxDataByteSize += 4;
+
+        const [scriptSigLength, scriptSigbyteSize] = calculateCompactSize(rawTxData,  totalRawTxDataByteSize);
         _scriptSigbyteSize = scriptSigbyteSize;
-        input.txid = getBytesOfHex(rawTxData, k * (6 + byteSize), 32);
-        input.vout = getBytesOfHex(rawTxData, k * (38 + byteSize), 4);
+        
         input.scriptSigSize = scriptSigLength;
-        input.scriptSig.hex = getBytesOfHex(rawTxData, k * (42 + byteSize + scriptSigbyteSize), parseInt(scriptSigLength, 16));
-        input.sequence = getBytesOfHex(rawTxData, k * (42 + byteSize + scriptSigbyteSize + parseInt(scriptSigLength, 16)), 4);
+        totalRawTxDataByteSize += scriptSigbyteSize;
+        input.scriptSig.hex = getBytesOfHex(rawTxData, totalRawTxDataByteSize, parseInt(scriptSigLength, 16));
+        totalRawTxDataByteSize += parseInt(scriptSigLength, 16);
+        input.sequence = getBytesOfHex(rawTxData, totalRawTxDataByteSize, 4);
+        totalRawTxDataByteSize += 4;
        
         console.log("Input: ", i);
         console.log("******************************************************");
@@ -102,14 +108,12 @@ export function parseRawTx(rawTxData: string) {
         console.log("Script Sig Size: ", input.scriptSigSize);
         console.log("Script Sig Byte Size: ", _scriptSigbyteSize);
         console.log("Script Sig: ", input.scriptSig.hex);
-        
         console.log("Sequence: ", input.sequence); 
 
         transaction.inputs.push(input);
         rawTxDataBuild += input.txid + input.vout + input.scriptSigSize + input.scriptSig.hex + input.sequence;
     }
 
-    totalRawTxDataByteSize += parseInt(inputCountHex as string, 16) * (_scriptSigbyteSize + 32 + 4 + 4)
     
     for (let i = 0; i < parseInt(transaction.outputCount, 16); i++) {
         const output = new Output();
@@ -137,6 +141,4 @@ export function parseRawTx(rawTxData: string) {
     console.log("Validate Tx Data");
     console.log("Tx Data Hash: ", txDataHash);
     console.log("******************************************************");
-    
-    
 }
