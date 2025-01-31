@@ -1,5 +1,4 @@
-import { parse } from "path";
-import { calculateCompactSize, getBytesOfHex, hash } from ".";
+import { calculateCompactSize, getBytesOfHex, hash, compactSizeFilter } from ".";
 
 class Transaction {
     version: string;
@@ -82,9 +81,10 @@ export function parseRawTx(rawTxData: string) {
     
     rawTxDataBuild += transaction.version + transaction.marker + transaction.flag + transaction.inputCount;
     totalRawTxDataByteSize += 6 + byteSize;
-
+    console.log("compactSizeFilter: ", compactSizeFilter(byteSize, inputCountHex.split(" ").join("")));
+    
     let _scriptSigbyteSize = 0;
-    for (let i = 0; i < parseInt(inputCountHex as string, 16); i++) {
+    for (let i = 0; i < parseInt(compactSizeFilter(byteSize, inputCountHex.split(" ").join("")), 16); i++) {
         const input = new Input();
         input.txid = getBytesOfHex(rawTxData, totalRawTxDataByteSize, 32);
         totalRawTxDataByteSize += 32;
@@ -93,7 +93,7 @@ export function parseRawTx(rawTxData: string) {
 
         const [scriptSigLength, scriptSigbyteSize] = calculateCompactSize(rawTxData,  totalRawTxDataByteSize);
         _scriptSigbyteSize = scriptSigbyteSize;
-        
+
         input.scriptSigSize = scriptSigLength;
         totalRawTxDataByteSize += scriptSigbyteSize;
         input.scriptSig.hex = getBytesOfHex(rawTxData, totalRawTxDataByteSize, parseInt(scriptSigLength, 16));
@@ -114,8 +114,10 @@ export function parseRawTx(rawTxData: string) {
         rawTxDataBuild += input.txid + input.vout + input.scriptSigSize + input.scriptSig.hex + input.sequence;
     }
 
+    const [outputCountHex, outputByteSize] = calculateCompactSize(rawTxData, 6);
+    transaction.outputCount = outputCountHex;
     
-    for (let i = 0; i < parseInt(transaction.outputCount, 16); i++) {
+    for (let i = 0; i < parseInt(compactSizeFilter(outputByteSize, outputCountHex.split(" ").join("")), 16); i++) {
         const output = new Output();
         output.amount = getBytesOfHex(rawTxData, (totalRawTxDataByteSize - 1), 8);
         const [scriptPubKeySize, scriptPubKeyByteSize] = calculateCompactSize(rawTxData, 42 + 8);

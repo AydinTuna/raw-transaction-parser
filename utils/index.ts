@@ -48,3 +48,28 @@ export function hash(txData: string) : string {
     const hash256 = createHash('sha256').update(sha256Hash).digest('hex')
     return hash256
 }
+
+export function convertToBigEndian(hex: string) : string {
+    return hex
+        .split("")
+        .map((_, i) => (i % 2 === 0 ? hex.slice(i, i + 2) : ""))
+        .filter((x) => x)
+        .reverse()
+        .join("");
+}
+
+export function compactSizeFilter(byteSize: number, countHex: string) { 
+    let bigEndianCount = '';
+    if (byteSize === 1) {
+        bigEndianCount = convertToBigEndian(getBytesOfHex(countHex, 0, 1));
+    } else if (byteSize === 3) {    
+        bigEndianCount = convertToBigEndian(getBytesOfHex(countHex, 1, 2));
+    } else if (byteSize === 5) {
+        bigEndianCount = convertToBigEndian(getBytesOfHex(countHex, 1, 4));
+    } else if (byteSize === 9) {
+        bigEndianCount = convertToBigEndian(getBytesOfHex(countHex, 1, 8));
+    }
+
+    return bigEndianCount.split(" ").join("");
+
+}
