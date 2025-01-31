@@ -1,5 +1,7 @@
 "use client"
 import useSessionStorage from "@/hooks/useSessionStorage";
+import { formatHexBytes, getBytesOfHex } from "@/utils/styleHexBytes";
+import { get } from "http";
 import { useState } from "react";
 
 export default function Page() {
@@ -26,11 +28,17 @@ export default function Page() {
                     setLoading(false);
                     if (data.rawData === "") {
                         setRawTxData("No data found");
+                        console.log("No data found");
+
                         return;
                     }
                     sessionStorage.setItem('rawTxData', data.rawData);
                     sessionStorage.setItem('txId', txId);
                     setRawTxData(data.rawData);
+
+                    const demo = getBytesOfHex(data.rawData, 7, 32);
+                    console.log(demo);
+
                 }).catch((error) => {
                     console.error(error);
                     setLoading(false);
@@ -48,8 +56,8 @@ export default function Page() {
             <p className="font-bold w-full text-start mb-2">Raw tx data:</p>
             {loading && <p className="text-black mt-4 font-bold">Loading...</p>}
             {(rawTxDataSession || rawTxData) && !loading && (
-                <pre className="whitespace-pre-wrap break-all p-4 bg-gray-100 rounded-lg shadow-lg">
-                    {rawTxDataSession || rawTxData}
+                <pre className="whitespace-pre-wrap p-4 bg-gray-100 rounded-lg shadow-lg">
+                    {formatHexBytes(rawTxDataSession || rawTxData)}
                 </pre>)}
         </div>
     )
