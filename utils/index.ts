@@ -44,9 +44,11 @@ export function calculateCompactSize(rawTxData: string, index: number) : [string
 
 
 export function hash(txData: string) : string {
-    const sha256Hash = createHash('sha256').update(txData).digest('hex')
-    const hash256 = createHash('sha256').update(sha256Hash).digest('hex')
-    return hash256
+    const bytes = Buffer.from(txData.split(" ").join(""), 'hex');
+    const sha256Hash = createHash('sha256').update(bytes).digest();
+    const hash256 = createHash('sha256').update(sha256Hash).digest();
+    
+    return hash256.toString('hex');
 }
 
 export function convertToBigEndian(hex: string) : string {

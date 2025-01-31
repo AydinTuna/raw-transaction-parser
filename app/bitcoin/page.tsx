@@ -36,7 +36,6 @@ export default function Page() {
                     setRawTxData(data.rawData);
                     parseRawTx(data.rawData);
                     const demo = getBytesOfHex(data.rawData, 0, 4);
-                    console.log("bits: ", demo);
 
                 }).catch((error) => {
                     console.error(error);

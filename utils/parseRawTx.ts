@@ -1,4 +1,5 @@
-import { calculateCompactSize, getBytesOfHex, hash, compactSizeFilter } from ".";
+import { parse } from "path";
+import { calculateCompactSize, getBytesOfHex, hash, compactSizeFilter, convertToBigEndian } from ".";
 
 class Transaction {
     version: string;
@@ -60,6 +61,26 @@ class Input  {
     }
 }
 
+class StackItem {
+    size: string;
+    item: string;
+
+    constructor(item: string) {
+        this.item = item;
+        this.size = "00"
+    }
+}
+
+class Witness {
+    stackItemCount: string;
+    stackItems: StackItem[];
+
+    constructor() {
+        this.stackItems = [];
+        this.stackItemCount = "00";
+    }
+}
+
 
 // Parse Raw Transaction Data
 export function parseRawTx(rawTxData: string) {
@@ -79,7 +100,9 @@ export function parseRawTx(rawTxData: string) {
     console.log("Input Count: ", transaction.inputCount);
     console.log("Input Count Byte Size: ", byteSize);
     
-    rawTxDataBuild += transaction.version + transaction.marker + transaction.flag + transaction.inputCount;
+    // rawTxDataBuild += transaction.version + transaction.marker + transaction.flag + transaction.inputCount;
+    // for segwit transactions
+    rawTxDataBuild += transaction.version + transaction.inputCount;
     totalRawTxDataByteSize += 6 + byteSize;
     console.log("compactSizeFilter: ", compactSizeFilter(byteSize, inputCountHex.split(" ").join("")));
     
@@ -114,15 +137,20 @@ export function parseRawTx(rawTxData: string) {
         rawTxDataBuild += input.txid + input.vout + input.scriptSigSize + input.scriptSig.hex + input.sequence;
     }
 
-    const [outputCountHex, outputByteSize] = calculateCompactSize(rawTxData, 6);
+    const [outputCountHex, outputByteSize] = calculateCompactSize(rawTxData, totalRawTxDataByteSize);
     transaction.outputCount = outputCountHex;
+    totalRawTxDataByteSize += outputByteSize;
+    rawTxDataBuild += transaction.outputCount;
     
     for (let i = 0; i < parseInt(compactSizeFilter(outputByteSize, outputCountHex.split(" ").join("")), 16); i++) {
         const output = new Output();
-        output.amount = getBytesOfHex(rawTxData, (totalRawTxDataByteSize - 1), 8);
-        const [scriptPubKeySize, scriptPubKeyByteSize] = calculateCompactSize(rawTxData, 42 + 8);
+        output.amount = getBytesOfHex(rawTxData, totalRawTxDataByteSize, 8);
+        totalRawTxDataByteSize += 8;
+        const [scriptPubKeySize, scriptPubKeyByteSize] = calculateCompactSize(rawTxData, totalRawTxDataByteSize);
         output.scriptPubKeySize = scriptPubKeySize;
-        output.scriptPubKey.hex = getBytesOfHex(rawTxData, 42 + 8 + scriptPubKeyByteSize, parseInt(scriptPubKeySize, 16));
+        totalRawTxDataByteSize += scriptPubKeyByteSize;
+        output.scriptPubKey.hex = getBytesOfHex(rawTxData, totalRawTxDataByteSize, parseInt(scriptPubKeySize, 16));
+        totalRawTxDataByteSize += parseInt(scriptPubKeySize, 16);
 
         console.log("Output: ", i);
         console.log("******************************************************");
@@ -132,15 +160,49 @@ export function parseRawTx(rawTxData: string) {
 
         transaction.outputs.push(output);
         rawTxDataBuild += output.amount + output.scriptPubKeySize + output.scriptPubKey.hex;
-        totalRawTxDataByteSize += 8 + scriptPubKeyByteSize + parseInt(scriptPubKeySize, 16);
     }
+
+    // For segwit transactions
+    for (let i = 0; i < parseInt(compactSizeFilter(byteSize, inputCountHex.split(" ").join("")), 16); i++) {
+        const witness = new Witness();
+        const [stackItemCount, stackItemByteSize] = calculateCompactSize(rawTxData, totalRawTxDataByteSize);
+        witness.stackItemCount = stackItemCount;
+        totalRawTxDataByteSize += stackItemByteSize;
+        // rawTxDataBuild += stackItemCount
+
+        console.log("Witness: ", i);    
+        console.log("******************************************************");
+        console.log("Stack Items: ", witness.stackItemCount);
+        console.log("Stack Item Byte Size: ", stackItemByteSize);
+
+        for (let j = 0; j < parseInt(compactSizeFilter(stackItemByteSize, stackItemCount.split(" ").join("")), 16); j++) {
+            const stackItem = new StackItem(getBytesOfHex(rawTxData, totalRawTxDataByteSize, 1));
+            const [stackItemSize, stackItemSizeByteSize] = calculateCompactSize(rawTxData, totalRawTxDataByteSize);
+            stackItem.size = stackItemSize;
+            totalRawTxDataByteSize += stackItemSizeByteSize;
+            stackItem.item = getBytesOfHex(rawTxData, totalRawTxDataByteSize, parseInt(stackItemSize, 16));
+            totalRawTxDataByteSize += parseInt(stackItemSize, 16);
+            witness.stackItems.push(stackItem);
+            
+            // rawTxDataBuild += stackItem.size + stackItem.item;
+
+            console.log("Stack Item: ", j); 
+            console.log("******************************************************");
+            console.log("Stack Item Size: ", stackItem.size);
+            console.log("Stack Item: ", stackItem.item);            
+        }
+    }
+
     transaction.locktime = getBytesOfHex(rawTxData, totalRawTxDataByteSize, 4);
     rawTxDataBuild += transaction.locktime;
-    const txDataHash = hash(rawTxDataBuild);
+    console.log("Locktime: ", transaction.locktime);
+    
+    totalRawTxDataByteSize += 4;
+    const txDataHash = convertToBigEndian(hash(rawTxDataBuild));
 
     console.log("******************************************************");
     console.log("Total Raw Tx Data Byte Size: ", totalRawTxDataByteSize);
     console.log("Validate Tx Data");
-    console.log("Tx Data Hash: ", txDataHash);
+    console.log("Tx Data Hash: ", txDataHash);    
     console.log("******************************************************");
 }
