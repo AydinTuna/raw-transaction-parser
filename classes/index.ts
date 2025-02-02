@@ -7,18 +7,23 @@ export class Transaction {
     outputCount: string;
     outputs: Output[];
     locktime: string;
+    totalRawTxDataByteSize: number;
+    witnesses: Witness[];
 
     constructor() {
         this.version = '';
         this.marker = '';
         this.flag = '';
-        this.inputCount = '01';
-        this.inputs = [new Input()];
-        this.outputCount = '01';
-        this.outputs = [new Output()];
+        this.inputCount = '00';
+        this.inputs = [];
+        this.outputCount = '00';
+        this.outputs = [];
         this.locktime = '';
+        this.totalRawTxDataByteSize = 0;
+        this.witnesses = [];
     }
 }
+
 
 export class Output {
     amount: string;

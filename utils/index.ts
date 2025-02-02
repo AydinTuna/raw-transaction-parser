@@ -1,12 +1,46 @@
-import { Output, Transaction } from "@/classes";
+import { Transaction } from "@/classes";
 import { createHash } from "crypto";
 
-export function formatHexBytes(hex: string): string {
-    return hex
-        .split("")
-        .map((_, i) => (i % 2 === 0 ? hex.slice(i, i + 2) : ""))
-        .filter((x) => x)
-        .join(" ");
+export function formatHexBytes(transaction: Transaction): string {
+    let rawTxData = "";
+
+    if (transaction === undefined) return rawTxData;
+
+
+    if (transaction.witnesses.length > 0) {
+        rawTxData += transaction.version +
+            " " + transaction.marker +
+            " " + transaction.flag +
+            " " + transaction.inputCount +
+            " ";
+
+        rawTxData += transaction.inputs.map(input => {
+            return input.txid + input.vout + input.scriptSigSize + input.scriptSig.hex + input.sequence + " ";
+        }).join(" ");
+        rawTxData += transaction.outputCount + " ";
+        rawTxData += transaction.outputs.map(output => {
+            return output.amount + output.scriptPubKeySize + output.scriptPubKey.hex + " ";
+        }).join(" ");
+        rawTxData += transaction.witnesses.map(witness => {
+            return witness.stackItemCount + witness.stackItems.map(stack => {
+                return stack.size + stack.item + " ";
+            }).join(" ");
+        }).join(" ");
+        rawTxData += transaction.locktime + " ";
+    } else {
+        rawTxData += transaction.version +
+            " " + transaction.inputCount +
+            " ";
+        rawTxData += transaction.inputs.map(input => {
+            return input.txid + input.vout + input.scriptSigSize + input.scriptSig.hex + input.sequence + " ";
+        }).join(" ");
+        rawTxData += transaction.outputCount + " ";
+        rawTxData += transaction.outputs.map(output => {
+            return output.amount + output.scriptPubKeySize + output.scriptPubKey.hex + " ";
+        }).join(" ");
+        rawTxData += transaction.locktime;
+    }
+    return rawTxData;
 }
 
 // Get the x bytes of the raw data from index point
@@ -17,9 +51,8 @@ export function getBytesOfHex(hex: string, index: number, length: number): strin
         .split("")
         .map((_, i) => (i % 2 === 0 ? hex.slice(i, i + 2) : ""))
         .filter((x, i) => i >= indexByte && i < indexByte + byteLength)
-        .join(" ");
+        .join("");
 }
-
 
 export function calculateCompactSize(rawTxData: string, index: number): [string, number] {
     const leadingByte = getBytesOfHex(rawTxData, index, 1);

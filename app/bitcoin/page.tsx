@@ -1,6 +1,7 @@
 "use client"
+import { Transaction } from "@/classes";
 import useSessionStorage from "@/hooks/useSessionStorage";
-import { formatHexBytes, getBytesOfHex } from "@/utils";
+import { formatHexBytes } from "@/utils";
 import { parseRawTx } from "@/utils/parseRawTx";
 import { useState } from "react";
 
@@ -8,6 +9,7 @@ export default function Page() {
     const [rawTxData, setRawTxData] = useState("");
     const [txId, setTxId] = useState("");
     const [loading, setLoading] = useState(false);
+    const [transaction, setTransaction] = useState<Transaction>();
     const txIdSession = useSessionStorage('txId');
     const rawTxDataSession = useSessionStorage('rawTxData');
 
@@ -31,18 +33,17 @@ export default function Page() {
                         console.log("No data found");
                         return;
                     }
-                    sessionStorage.setItem('rawTxData', data.rawData);
+                    const parsedTransaction = parseRawTx(data.rawData);
+                    setTransaction(parsedTransaction);
+                    const formattedHexBytes = formatHexBytes(parsedTransaction);
+                    setRawTxData(formattedHexBytes);
+                    sessionStorage.setItem('rawTxData', formattedHexBytes);
                     sessionStorage.setItem('txId', txId);
-                    setRawTxData(data.rawData);
-                    parseRawTx(data.rawData);
-                    const demo = getBytesOfHex(data.rawData, 0, 4);
-
                 }).catch((error) => {
                     console.error(error);
                     setLoading(false);
                 });
         } else setLoading(false);
-
     }
     return (
         <div className="flex flex-col items-center justify-start w-full p-8 sm:p-20 sm:pt-8">
@@ -53,12 +54,19 @@ export default function Page() {
             </form>
             <p className="font-bold w-full text-start mb-2">Raw tx data:</p>
             {loading && <p className="text-black mt-4 font-bold">Loading...</p>}
-            {(rawTxDataSession || rawTxData) && !loading && (
-                <pre className="whitespace-pre-wrap p-4 bg-gray-100 rounded-lg shadow-lg">
+            {transaction && !loading ? (
+                <pre className="whitespace-pre-wrap break-all p-4 bg-gray-100 rounded-lg shadow-lg">
                     <code>
-                        {formatHexBytes(rawTxDataSession || rawTxData)}
+                        {formatHexBytes(transaction as Transaction)}
                     </code>
-                </pre>)}
+                </pre>
+            ) : (rawTxDataSession || rawTxData) && !loading ? (
+                <pre className="whitespace-pre-wrap break-all p-4 bg-gray-100 rounded-lg shadow-lg">
+                    <code>
+                        {rawTxDataSession || rawTxData}
+                    </code>
+                </pre>
+            ) : null}
         </div>
     )
 }
