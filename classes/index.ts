@@ -22,6 +22,14 @@ export class Transaction {
         this.totalRawTxDataByteSize = 0;
         this.witnesses = [];
     }
+
+    isSegWit() {
+        return parseInt(this.marker, 16) === parseInt("00", 16) && parseInt(this.flag, 16) >= parseInt("01", 16);
+    }
+
+    isCoinbase() {
+        return this.inputs[0].txid === "0".repeat(64) && this.inputs[0].vout === "ffffffff";
+    }
 }
 
 

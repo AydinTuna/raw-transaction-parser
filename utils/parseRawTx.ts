@@ -2,7 +2,7 @@ import { calculateCompactSize, getBytesOfHex, hash, compactSizeFilter, convertTo
 import { Input, Output, StackItem, Transaction, Witness } from "@/classes";
 
 export function parseRawTx(rawTxData: string) {
-    // Check if SegWit (marker = 00, flag = 01)
+    // Check if SegWit (marker = 00, flag >= 01)
     let marker = getBytesOfHex(rawTxData, 4, 1);
     let flag = getBytesOfHex(rawTxData, 5, 1);
     let isSegWit = parseInt(marker, 16) === parseInt("00", 16) && parseInt(flag, 16) >= parseInt("01", 16);
@@ -67,6 +67,7 @@ function parseLegacyTx(rawTxData: string) {
 
     totalRawTxDataByteSize += 4;
     const txDataHash = convertToBigEndian(hash(rawTxDataBuild));
+    transaction.totalRawTxDataByteSize = totalRawTxDataByteSize;
 
     console.log("******************************************************");
     console.log("Total Raw Tx Data Byte Size: ", totalRawTxDataByteSize);
