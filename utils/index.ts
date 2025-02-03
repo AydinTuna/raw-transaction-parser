@@ -4,44 +4,47 @@ import { createHash } from "crypto";
 export function formatHexBytes(transaction: Transaction): string {
     let rawTxData = "";
 
-    if (transaction === undefined) return rawTxData;
-
+    if (!transaction) return rawTxData;
 
     if (transaction.witnesses.length > 0) {
-        rawTxData += transaction.version +
-            " " + transaction.marker +
-            " " + transaction.flag +
-            " " + transaction.inputCount +
-            " ";
+        rawTxData += transaction.version + " " +
+            transaction.marker + " " +
+            transaction.flag + " " +
+            transaction.inputCount + " ";
 
         rawTxData += transaction.inputs.map(input => {
-            return input.txid + input.vout + input.scriptSigSize + input.scriptSig.hex + input.sequence + " ";
-        }).join(" ");
+            return input.txid + " " + input.vout + " " + input.scriptSigSize + " " + input.scriptSig.hex + " " + input.sequence;
+        }).join(" ") + " ";
+
         rawTxData += transaction.outputCount + " ";
         rawTxData += transaction.outputs.map(output => {
-            return output.amount + output.scriptPubKeySize + output.scriptPubKey.hex + " ";
-        }).join(" ");
+            return output.amount + " " + output.scriptPubKeySize + " " + output.scriptPubKey.hex;
+        }).join(" ") + " ";
+
         rawTxData += transaction.witnesses.map(witness => {
-            return witness.stackItemCount + witness.stackItems.map(stack => {
-                return stack.size + stack.item + " ";
+            return witness.stackItemCount + " " + witness.stackItems.map(stack => {
+                return stack.size + " " + stack.item;
             }).join(" ");
-        }).join(" ");
-        rawTxData += transaction.locktime + " ";
+        }).join(" ") + " ";
+
+        rawTxData += transaction.locktime;
     } else {
-        rawTxData += transaction.version +
-            " " + transaction.inputCount +
-            " ";
+        rawTxData += transaction.version + " " + transaction.inputCount + " ";
+
         rawTxData += transaction.inputs.map(input => {
-            return input.txid + input.vout + input.scriptSigSize + input.scriptSig.hex + input.sequence + " ";
-        }).join(" ");
+            return input.txid + " " + input.vout + " " + input.scriptSigSize + " " + input.scriptSig.hex + " " + input.sequence;
+        }).join(" ") + " ";
+
         rawTxData += transaction.outputCount + " ";
         rawTxData += transaction.outputs.map(output => {
-            return output.amount + output.scriptPubKeySize + output.scriptPubKey.hex + " ";
-        }).join(" ");
+            return output.amount + " " + output.scriptPubKeySize + " " + output.scriptPubKey.hex;
+        }).join(" ") + " ";
+
         rawTxData += transaction.locktime;
     }
-    return rawTxData;
+    return rawTxData.trim(); // Remove any trailing spaces
 }
+
 
 // Get the x bytes of the raw data from index point
 export function getBytesOfHex(hex: string, index: number, length: number): string {
