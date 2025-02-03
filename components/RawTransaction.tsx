@@ -5,7 +5,7 @@ export default function RawTransaction({ rawTxDataJson }: { rawTxDataJson: Trans
         <div className="p-4 bg-gray-100 rounded-lg border border-red-300 shadow-lg font-mono text-sm">
             <div className="flex space-x-4 mb-4 w-max">
                 {rawTxDataJson.isSegWit() && (
-                    <div className="py-2 px-4 rounded-full font-bold bg-red-100 shadow-sm shadow-red-300 flex-1 cursor-pointer">
+                    <div className="py-2 px-4 rounded-full font-bold bg-red-100 shadow-sm shadow-red-300 cursor-pointer">
                         <span className="text-red-500">
                             SegWit
                         </span>
@@ -13,15 +13,15 @@ export default function RawTransaction({ rawTxDataJson }: { rawTxDataJson: Trans
                 )}
 
                 {rawTxDataJson.isCoinbase() && (
-                    <div className="py-2 px-4 rounded-full font-bold bg-green-100 shadow-sm shadow-green-300 flex-1 cursor-pointer">
-                        <span className="text-green-500">
+                    <div className="py-2 px-4 rounded-full font-bold bg-green-100 shadow-sm shadow-green-300 cursor-pointer">
+                        <span className="text-green-500 w-full">
                             Coinbase
                         </span>
                     </div>
                 )}
 
                 {!rawTxDataJson.isSegWit() && (
-                    <div className="py-2 px-4 rounded-full font-bold bg-gray-200 shadow-sm shadow-gray-400 flex-1 cursor-pointer">
+                    <div className="py-2 px-4 rounded-full font-bold bg-gray-200 shadow-sm shadow-gray-400 cursor-pointer">
                         <span className="text-gray-700">
                             Legacy Transaction
                         </span>
