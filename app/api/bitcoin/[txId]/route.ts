@@ -2,7 +2,7 @@ export const dynamic = "force-dynamic";
 
 export async function GET(req: Request, context: { params: Promise<{ txId: string }> }) {
     try {
-        const { txId } = await context.params; // Correctly extract txId
+        const { txId } = await context.params;
         const response = await fetch(`https://blockchain.info/rawtx/${txId}?format=hex`);
 
         if (!response.ok) {
