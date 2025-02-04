@@ -1,14 +1,18 @@
-export async function GET(req: Request, { params }: { params: { txId: string } }) {
+export const dynamic = "force-dynamic";
+
+export async function GET(req: Request, context: { params: Promise<{ txId: string }> }) {
     try {
-        const txId = (await params).txId
-        const data = await fetch(`https://blockchain.info/rawtx/${txId}?format=hex`)
-        if (!data.ok) {
-            return Response.json({ rawData: "" })
+        const { txId } = await context.params; // Correctly extract txId
+        const response = await fetch(`https://blockchain.info/rawtx/${txId}?format=hex`);
+
+        if (!response.ok) {
+            return Response.json({ rawData: "" }, { status: response.status });
         }
-        
-        const rawData = await data.text()
-        return Response.json({ rawData: rawData })
+
+        const rawData = await response.text();
+        return Response.json({ rawData });
     } catch (error) {
-        console.log(error);  
+        console.error(error);
+        return Response.json({ error: "Internal Server Error" }, { status: 500 });
     }
 }

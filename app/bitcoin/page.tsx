@@ -8,7 +8,6 @@ import { useState } from "react";
 
 export default function Page() {
     const [rawTxData, setRawTxData] = useState("");
-    const [txId, setTxId] = useState("");
     const [loading, setLoading] = useState(false);
     const [transaction, setTransaction] = useState<Transaction | null>(null);
     const txIdSession = useSessionStorage('txId');
@@ -26,7 +25,6 @@ export default function Page() {
         const form = event.target as HTMLFormElement;
         const formData = new FormData(form);
         const transactionId = formData.get('txId') as string;
-        setTxId(transactionId);
 
         if (transactionId) {
             // Call the API to get the transaction details
