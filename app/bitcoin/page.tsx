@@ -41,6 +41,7 @@ export default function Page() {
                     const parsedTransaction = parseRawTx(data.rawData);
                     setTransaction(parsedTransaction);
 
+
                     const formattedHexBytes = formatHexBytes(parsedTransaction);
                     setRawTxData(formattedHexBytes);
                     sessionStorage.setItem('rawTxDataJson', JSON.stringify(parsedTransaction));
