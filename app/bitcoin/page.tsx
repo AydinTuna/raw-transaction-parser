@@ -74,7 +74,6 @@ export default function Page() {
                 </button>
             </form>
 
-
             <div className="w-full max-w-2xl mt-8">
                 <p className="font-bold w-full text-start mb-2 text-gray-700">Raw Transaction Data:</p>
                 {loading && <p className="text-black mt-4 font-bold w-full text-center">Loading...</p>}
