@@ -75,7 +75,7 @@ export default function Page() {
             </form>
 
             <div className="w-full mt-8">
-                <p className="font-bold w-full text-start mb-2 text-gray-700">Raw Transaction Data:</p>
+                <p className="font-bold w-full text-start mb-2 text-gray-700">Transaction Data:</p>
                 {loading && <p className="text-black mt-4 font-bold w-full text-center">Loading...</p>}
                 {transaction && !loading ? (
                     <RawTransaction rawTxDataJson={transaction} />
