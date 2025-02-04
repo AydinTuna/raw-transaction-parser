@@ -1,5 +1,3 @@
-export const dynamic = "force-dynamic";
-
 export async function GET(req: Request, context: { params: Promise<{ txId: string }> }) {
     try {
         const { txId } = await context.params;
