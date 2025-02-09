@@ -79,9 +79,9 @@ export default function Page() {
                 {loading && <p className="text-black mt-4 font-bold w-full text-center">Loading...</p>}
                 {transaction && !loading ? (
                     <RawTransaction rawTxDataJson={transaction} />
-                ) : (parsedTransaction || rawTxDataSession || rawTxData) && !loading ? (
+                ) : (parsedTransaction || rawTxDataSession) && rawTxDataSession !== null && !loading ? (
                     <RawTransaction rawTxDataJson={parsedTransaction || JSON.parse(rawTxDataSession)} />
-                ) : null}
+                ) : !loading && <p className="text-black mt-4 font-bold w-full text-center">No Data!</p>}
             </div>
         </div>
     );
