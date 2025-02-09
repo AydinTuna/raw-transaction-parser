@@ -2,7 +2,6 @@
 import { Transaction } from "@/classes";
 import RawTransaction from "@/components/RawTransaction";
 import useSessionStorage from "@/hooks/useSessionStorage";
-import { formatHexBytes } from "@/utils";
 import { parseRawTx } from "@/utils/parseRawTx";
 import { useState } from "react";
 
@@ -37,13 +36,9 @@ export default function Page() {
                         console.log("No data found");
                         return;
                     }
-
                     const parsedTransaction = parseRawTx(data.rawData);
                     setTransaction(parsedTransaction);
 
-
-                    const formattedHexBytes = formatHexBytes(parsedTransaction);
-                    setRawTxData(formattedHexBytes);
                     sessionStorage.setItem('rawTxDataJson', JSON.stringify(parsedTransaction));
                     sessionStorage.setItem('txId', transactionId);
                 }).catch((error) => {
@@ -81,7 +76,7 @@ export default function Page() {
                     <RawTransaction rawTxDataJson={transaction} />
                 ) : (parsedTransaction || rawTxDataSession) && rawTxDataSession !== null && !loading ? (
                     <RawTransaction rawTxDataJson={parsedTransaction || JSON.parse(rawTxDataSession)} />
-                ) : !loading && <p className="text-black mt-4 font-bold w-full text-center">No Data!</p>}
+                ) : !loading && <p className="text-black mt-4 font-bold w-full text-center">{rawTxData}</p>}
             </div>
         </div>
     );
