@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import Navigation from "@/components/Navigation";
+import Navigation from "../components/Navigation";
 import { Analytics } from "@vercel/analytics/react"
 
 const geistSans = Geist({
@@ -16,7 +16,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Raw Transaction Parser",
-  description: "Parse raw Bitcoin and Ethereum transactions",
+  description: "Parse raw Bitcoin transactions",
 };
 
 export default function RootLayout({

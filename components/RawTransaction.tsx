@@ -1,4 +1,4 @@
-import { Transaction } from "@/classes";
+import { Transaction } from "../classes";
 
 export default function RawTransaction({ rawTxDataJson }: { rawTxDataJson: Transaction }) {
     return (

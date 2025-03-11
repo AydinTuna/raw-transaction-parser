@@ -1,5 +1,5 @@
-import { calculateCompactSize, getBytesOfHex, hash, compactSizeFilter, convertToBigEndian } from ".";
-import { Input, Output, StackItem, Transaction, Witness } from "@/classes";
+import { calculateCompactSize, getBytesOfHex, hash, compactSizeFilter, convertToBigEndian } from "../utils";
+import { Input, Output, StackItem, Transaction, Witness } from "../classes";
 
 export function parseRawTx(rawTxData: string) {
     // Check if SegWit (marker = 00, flag >= 01)
