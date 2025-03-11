@@ -52,6 +52,14 @@ export default function Home() {
 
   return (
     <div className="flex flex-col items-center justify-start w-full p-8 sm:p-20 sm:pt-8">
+      <div className="w-full mb-8">
+        <div className="bg-gradient-to-r from-blue-600 to-blue-800 rounded-xl shadow-lg p-6 text-center">
+          <h1 className="text-4xl font-extrabold text-white tracking-tight">
+            Raw Bitcoin Transaction Parser
+          </h1>
+          <p className="text-blue-100 mt-2">Decode and analyze Bitcoin transactions with ease</p>
+        </div>
+      </div>
       <form className="flex flex-col w-full bg-white shadow-lg rounded-xl p-6 space-y-6" onSubmit={handleFormSubmit}>
         <h1 className="text-3xl font-bold text-center text-gray-800">Enter Transaction ID</h1>
         <input
