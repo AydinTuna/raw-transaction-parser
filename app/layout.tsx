@@ -16,7 +16,8 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Raw Transaction Parser",
-  description: "Parse raw Bitcoin transactions",
+  description: "Parse Bitcoin transactions",
+  keywords: ["Bitcoin", "Transaction", "Parser", "Raw", "Transaction", "Parser", "Bitcoin", "Transaction", "Parser"],
   icons: {
     icon: '/favicon.ico',
     shortcut: '/favicon.ico',
