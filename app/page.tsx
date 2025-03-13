@@ -104,11 +104,11 @@ export default function Home() {
         <h2 className="text-2xl font-bold text-gray-800 mb-3">What is a Bitcoin Transaction?</h2>
         <p className="text-gray-700 mb-4">
           Bitcoin transactions are the building blocks of the Bitcoin network. Each transaction contains
-          inputs (where the bitcoins are coming from), outputs (where they're going to), and other metadata
+          inputs (where the bitcoins are coming from), outputs (where they&apos;re going to), and other metadata
           like version, locktime, and witness data for SegWit transactions.
         </p>
         <p className="text-gray-700">
-          This tool helps you decode raw transaction data to understand what's happening under the hood.
+          This tool helps you decode raw transaction data to understand what&apos;s happening under the hood.
           Simply enter a transaction ID to get started!
         </p>
       </div>
